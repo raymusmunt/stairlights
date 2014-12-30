@@ -1,3 +1,6 @@
+//////////       scheme to include timing data
+
+
 //for clock
 #include <Wire.h>
 #include "RTClib.h"
@@ -15,70 +18,70 @@ int scheme[][5][3]=
 {
   {
     {
-      11,255,164        }
+      11,255,164            }
     ,
     {
-      10 ,229,232        }
+      10 ,229,232            }
     ,
     {
-      2,160,255        }
+      2,160,255            }
     ,
     {
-      10,69,232        }
+      10,69,232            }
     ,
     {
-      27,3,255        }
+      27,3,255            }
   }
   ,
   {
     {
-      20,204,82        }
+      20,204,82            }
     ,
     {
-      11 ,255,162        }
+      11 ,255,162            }
     ,
     {
-      255,81,0        }
+      255,81,0            }
     ,
     {
-      153,92,0        }
+      153,92,0            }
     ,
     {
-      204,131,20        }
+      204,131,20            }
   }
   ,
   {
     {
-      255,146,0        }
+      255,146,0            }
     ,
     {
-      255,98,12        }
+      255,98,12            }
     ,
     {
-      255,61,0        }
+      255,61,0            }
     ,
     {
-      232,30,12        }
+      232,30,12            }
     ,
     {
-      255,2,64        }
+      255,2,64            }
   }
   ,
   {
     {
-      204,59,0        }
+      204,59,0            }
     ,
     {
-      153,60,23        }
+      153,60,23            }
     ,
     {
-      255,0,4        }
+      255,0,4            }
     ,
     {
-      50,255,48        }
+      50,255,48            }
     ,
     {
-      73,204,0        }
+      73,204,0            }
   }
 };
 
@@ -128,17 +131,17 @@ goingDown=0,
 finishUp = 0, 
 finishDown = 0, 
 hasPlayed=0;
-int sensorTimeoutValue=9000;
+int sensorTimeoutValue=1500;
 int autoShutdownTime=20000;
 
 // tempory testing shit
 unsigned long  
-sensorTimeout=millis()-9000,
+sensorTimeout=millis()-1500,
 autoShutdown=millis();
 
 
 void setup () {
-
+  randomSeed(analogRead(ldrPin));
   vw_set_ptt_inverted(true); // Required for DR3100
   vw_set_rx_pin(rfPin);
   vw_setup(300);  // Bits per sec
@@ -148,7 +151,7 @@ void setup () {
   rtc.begin();
   stairLights.begin();
   stairLights.show();
-  //rtc.adjust(DateTime(2014, 12, 29, 18, 48, 0));
+  //rtc.adjust(DateTime(2014, 12, 30, 15, 50, 0));
   pinMode(ldrPin,INPUT);
   pinMode(rfPin,INPUT);
 
@@ -168,6 +171,7 @@ void loop () {
 
   schemeChooser();
   //schemeChoice=3;
+
   for(int i=0; i<3; i++){
     for (int i = 0;i<3;i++)
     {
@@ -216,11 +220,11 @@ void changeStep(int _stair_number, int _from_colour[], int _to_colour[],int _fad
   // starts from 0,1,2,3...11
   int stair_number = _stair_number * 3;
   int directions[3] = {
-    0,0,0    };
+    0,0,0      };
   int from_colour[3]={
-    0,0,0        };
+    0,0,0          };
   int to_colour[3]={
-    0,0,0        };
+    0,0,0          };
   int finished = 0;
 
 
@@ -244,9 +248,9 @@ void changeStep(int _stair_number, int _from_colour[], int _to_colour[],int _fad
 
 
   while(finished==0){
-//
-stairCheck(); ////////////////////////////////////////////////////////////////////////////////////////////
-//
+    //
+    //stairCheck(); ////////////////////////////////////////////////////////////////////////////////////////////
+    //
     int counter = 0;
     for(int i=0; i<3; i++){
 
@@ -290,11 +294,11 @@ void changeAll(int _from_colour[], int _to_colour[],int _fade_speed, int _delay)
 
   // starts from 0,1,2,3...11
   int directions[3] = {
-    0,0,0    };
+    0,0,0      };
   int from_colour[3]={
-    0,0,0        };
+    0,0,0          };
   int to_colour[3]={
-    0,0,0        };
+    0,0,0          };
   int finished = 0;
 
 
@@ -314,9 +318,9 @@ void changeAll(int _from_colour[], int _to_colour[],int _fade_speed, int _delay)
 
 
   while(finished==0){
-//
-stairCheck(); ////////////////////////////////////////////////////////////////////////////////////////////
-//
+    //
+    //stairCheck(); ////////////////////////////////////////////////////////////////////////////////////////////
+    //
     int counter = 0;
     for(int i=0; i<3; i++){
 
@@ -418,8 +422,12 @@ void stairCheck (){
 
 void stairAction(){
   int ranNum = random(0, 100), choice = 0;
-  if(ranNum>50) choice = 1;
-  else choice = 2;
+
+  if(ranNum >66) choice=1;
+  else if(ranNum>33) choice = 2;   
+  else if (ranNum<=33) choice = 3; 
+  else choice = 1;
+  // int choice = 3;
 
   if(goingUp == 1 && hasPlayed == 0){
 
@@ -473,20 +481,20 @@ void upSequence(int _selection){
   switch (_selection) {
   case 1:
     for (int i = 0;i < 12;i++) {
-      changeStep(i, offColour, selectedColour, 3,0);
+      changeStep(i, offColour, selectedColour, 4,0);
     }
 
 
-    changeAll(selectedColour,selectedColour2,1,0);
+    changeAll(selectedColour,selectedColour2,2,0);
 
-    changeAll( selectedColour2, selectedColour3, 1,0);
+    changeAll( selectedColour2, selectedColour3, 2,0);
 
 
 
 
 
     for (int i = 0;i < 12;i++) {
-      changeStep(i, selectedColour3,selectedColour4,1,0);
+      changeStep(i, selectedColour3,selectedColour4,2,0);
     }
 
     changeAll(selectedColour4, selectedColour5, 1,0);
@@ -500,12 +508,12 @@ void upSequence(int _selection){
   case 2:
     for(int i=0; i<12; i+=3){
       changeStep(i, offColour, selectedColour,4,0);
-      changeStep(i+1, offColour, selectedColour3,2,0);
-      changeStep(i+2, offColour, selectedColour5,1,0);
+      changeStep(i+1, offColour, selectedColour3,3,0);
+      changeStep(i+2, offColour, selectedColour5,2,0);
     }
     for(int i=0; i<12; i+=3){
-      changeStep(i, selectedColour, selectedColour2,1,0);
-      changeStep(i+1, selectedColour3, selectedColour2,1,0);
+      changeStep(i, selectedColour, selectedColour2,2,0);
+      changeStep(i+1, selectedColour3, selectedColour2,2,0);
       changeStep(i+2, selectedColour5, selectedColour2,1,0);
     }
     changeAll(selectedColour2, selectedColour,1,0);
@@ -514,6 +522,26 @@ void upSequence(int _selection){
 
     }
     break;
+
+
+  case 3:
+    for(int i=0; i<12; i+=2){
+      changeStep(i, offColour, selectedColour,3,0);
+    }
+    for(int i=1; i<12; i+=2){
+      changeStep(i, offColour, selectedColour4,3,0);
+    }
+    for(int i=0; i<12; i+=2){
+      changeStep(i, selectedColour, selectedColour4,3,0);
+    }
+    changeAll(selectedColour4, selectedColour5,1,0);
+
+
+    for(int i=0; i<3; i++){
+      lastColour[i]=selectedColour5[i];
+    }
+    break;
+
   default:
     break;
   }
@@ -525,18 +553,18 @@ void downSequence(int _selection){
   case 1:
     for (int i = 11;i >= 0 ;i--) {
 
-      changeStep(i, offColour, selectedColour, 2,0);
+      changeStep(i, offColour, selectedColour, 4,0);
     }
-    changeAll(selectedColour,selectedColour2,1,0);
+    changeAll(selectedColour,selectedColour2,2,0);
 
-    changeAll( selectedColour2, selectedColour3, 1,0);
+    changeAll( selectedColour2, selectedColour3, 2,0);
 
 
 
 
 
     for (int i = 11;i >= 0 ;i--) {
-      changeStep(i, selectedColour3,selectedColour4,1,0);
+      changeStep(i, selectedColour3,selectedColour4,2,0);
     }
 
     changeAll(selectedColour4, selectedColour5, 1,0);
@@ -553,13 +581,13 @@ void downSequence(int _selection){
   case 2:
     for(int i=12; i>=0; i-=3){
       changeStep(i, offColour, selectedColour,4,0);
-      changeStep(i-1, offColour, selectedColour3,2,0);
-      changeStep(i-2, offColour, selectedColour5,1,0);
+      changeStep(i-1, offColour, selectedColour3,3,0);
+      changeStep(i-2, offColour, selectedColour5,2,0);
     }
     for(int i=12; i>=0; i-=3){
-      changeStep(i, selectedColour, selectedColour2,1,0);
-      changeStep(i-1, selectedColour3, selectedColour2,1,0);
-      changeStep(i-2, selectedColour5, selectedColour2,1,0);
+      changeStep(i, selectedColour, selectedColour2,2,0);
+      changeStep(i-1, selectedColour3, selectedColour2,2,0);
+      changeStep(i-2, selectedColour5, selectedColour2,2,0);
     }
     changeAll(selectedColour2, selectedColour,1,0);
     for(int i=0; i<3; i++){
@@ -567,6 +595,22 @@ void downSequence(int _selection){
 
     }
     break;
+
+
+
+  case 3:
+    for(int i=12; i>=0; i-=2){
+      changeStep(i, offColour, selectedColour,3,0);
+    }
+    for(int i=11; i>=0; i-=2){
+      changeStep(i, offColour, selectedColour4,3,0);
+    }
+    for(int i=12; i>=0; i-=2){
+      changeStep(i, selectedColour, selectedColour4,3,0);
+    }
+    changeAll(selectedColour4, selectedColour5,1,0);
+
+
   default:
     break;
   }
@@ -595,5 +639,6 @@ void schemeChooser(){
 
 
 }
+
 
 
